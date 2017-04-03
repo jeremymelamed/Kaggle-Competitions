@@ -1,0 +1,53 @@
+# Data analysis and processing for Two Sigma Rental Listing competition
+# Author: Jeremy Melamed
+# Date: April, 2017
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import statsmodels.formula.api as smf
+
+### Read in training data set
+train = pd.read_json("Two-Sigma_Rental-Listings/train.json")
+test = pd.read_json("Two-Sigma_Rental-Listings/test.json")
+
+### Data summary
+test.info()
+train.describe()
+
+### Class distribution for variable of interest. Significant class imbalance for high interest group. 
+train.interest_level.value_counts() / train.interest_level.count()
+# low = 0.695
+# medium = 0.228
+# high = 0.0778
+
+### Most high end listings have low interest. 
+expensive_listings = train[train.price > np.percentile(train.price, 95)]
+expensive_listings.interest_level.value_counts() / expensive_listings.interest_level.count()
+
+normal_listings = train[train.price < np.percentile(train.price, 95)]
+
+# Indicator variable for whether listing is greater than 95 percentile listing price ($6895)
+train['expensive_listing'] = (train['price'] > np.percentile(train.price, 95)).astype(int)
+
+
+# Fit regression model using bathrooms and bedrooms to predict prict
+normal_listings.plot(kind='scatter', x='bathrooms', y='price')
+
+
+### Interest level for combinations of bathrooms and bedrooms
+pd.pivot_table(train, index=['bathrooms', 'interest_level'], values=['latitude'], aggfunc=len)
+pd.pivot_table(train, index=['bedrooms', 'interest_level'], values=['latitude'], aggfunc=len)
+
+
+
+# Price variable
+pd.pivot_table(train, index=['interest_level'], 
+        values=['price'], aggfunc=[np.mean, np.std, len])
+
+train[math.log('price')].hist()
+
+
+
+plt.boxplot(train.price.values)
+
