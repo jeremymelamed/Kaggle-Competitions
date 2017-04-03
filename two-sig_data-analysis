@@ -1,0 +1,36 @@
+# Data analysis and processing for Two Sigma Rental Listing competition
+# Author: Jeremy Melamed
+# Date: April, 2017
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+### Read in training data set
+train = pd.DataFrame(pd.read_json("Two-Sigma_Rental-Listings/train.json"))
+test = pd.read_json("Two-Sigma_Rental-Listings/test.json")
+
+### Data summary
+train.info()
+train.describe()
+
+
+### Class distribution for variable of interest. Significant class imbalance for high interest group. 
+train.interest_level.value_counts() / train.interest_level.count()
+# low = 0.695
+# medium = 0.228
+# high = 0.0778
+
+
+### People will likely be more interested in listings that offer a good deal.
+price_pivot = pd.pivot_table(train, index=['bedrooms'], 
+                values=['price'], aggfunc=[np.mean])
+price_pivot.columns = ['meanprice']
+
+beds_value = []
+for i in range(0, len(train)):
+        # beds = train.bedrooms[i]
+        # beds_value = train.price[i] - price_pivot[beds]
+
+
+
